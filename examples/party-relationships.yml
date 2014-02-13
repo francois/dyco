@@ -1,3 +1,6 @@
+# A database schema to represent party and organization relationships
+# Credit: Newcum, Joseph, "A Universal Person and Organization Data Model" (http://www.tdan.com/view-articles/5014) [July 2002]
+
 declarations:
   id:
     type: serial
