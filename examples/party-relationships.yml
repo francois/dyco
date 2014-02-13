@@ -1,0 +1,221 @@
+declarations:
+  id:
+    type: serial
+    "null": false
+  refid:
+    type: bigint
+    "null": false
+  optional_refid:
+    type: bigint
+    "null": false
+  name:
+    type: text
+    "null": false
+  optional_name:
+    type: text
+    "null": true
+  date:
+    type: date
+    "null": false
+  optional_date:
+    type: date
+    "null": true
+  function:
+    type: text
+    "null": false
+  phone:
+    type: text
+    "null": false
+  email:
+    type: text
+    "null": false
+  url:
+    type: text
+    "null": false
+  optional_extension:
+    type: text
+    "null": true
+  address:
+    type: text
+    "null": false
+  optional_address:
+    type: text
+    "null": true
+  city:
+    type: text
+    "null": false
+  zip_or_postal_code:
+    type: text
+    "null": false
+    constraints:
+      all_upper_case: _ = upper(_)
+      contains_no_spaces: _ = translate(_, ' ', '')
+  timestamp:
+    type: timestamp with time zone
+    "null": false
+  username:
+    type: text
+    "null": false
+    default: current_user
+  created_at:
+    type: timestamp with time zone
+    "null": false
+    default: current_timestamp
+  updated_at:
+    type: timestamp with time zone
+    "null": false
+    default: current_timestamp
+
+tables:
+  - name_functions:
+    name_function: function
+    pkey: name_function
+
+  - locator_functions:
+    locator_function: function
+    pkey: locator_function
+
+  - zip_or_postal_codes:
+    zip_or_postal_code: zip_or_postal_code
+    pkey: zip_or_postal_code
+
+  - cities:
+    city: name
+    zip_or_postal_code: zip_or_postal_code
+    pkey: [city, zip_or_postal_code]
+    references:
+      zip_or_postal_codes: zip_or_postal_code
+
+  - mailboxes:
+    address1: address
+    address2: address
+    address3: address
+    city: city
+    zip_or_postal_code: zip_or_postal_code
+    pkey: [address1, address2, address3, city, zip_or_postal_code]
+    references:
+      cities: [city, zip_or_postal_code]
+
+  - sites:
+    address1: address
+    address2: address
+    address3: address
+    city: city
+    zip_or_postal_code: zip_or_postal_code
+    pkey: [address1, address2, address3, city, zip_or_postal_code]
+    references:
+      cities: [city, zip_or_postal_code]
+
+  - parties:
+    born_on: optional_date
+    pkey: id
+
+  - party_names:
+    party_id: refid
+    first_used_on: date
+    name_function: function
+    surname: name
+    rest_of_name: optional_name
+    salutation: optional_name
+    last_used_on: optional_date
+    pkey: [party_id, first_used_on, name_function]
+    references:
+      parties: party_id
+
+  - locators:
+    party_id: refid
+    locator_function: function
+    first_used_on: date
+    last_used_on: optional_date
+    pkey: [party_id, locator_function, first_used_on]
+    references:
+      locator_functions: locator_function
+      parties: party_id
+
+  - web_locators:
+    party_id: refid
+    locator_function: function
+    first_used_on: date
+    url: url
+    pkey: [party_id, locator_function, url]
+    references:
+      locators: [party_id, locator_function, first_used_on]
+
+  - email_locators:
+    party_id: refid
+    locator_function: function
+    first_used_on: date
+    email_address: email
+    pkey: [party_id, locator_function, email_address]
+    references:
+      locators: [party_id, locator_function, first_used_on]
+
+  - phone_locators:
+    party_id: refid
+    locator_function: function
+    first_used_on: date
+    phone: phone
+    extension: optional_extension
+    pkey: [party_id, locator_function, phone]
+    references:
+      locators: [party_id, locator_function, first_used_on]
+
+  - walk_to_locators:
+    party_id: refid
+    locator_function: function
+    first_used_on: date
+    address1: address
+    address2: address
+    address3: address
+    city: city
+    zip_or_postal_code: zip_or_postal_code
+    pkey: [party_id, locator_function, address1, city, zip_or_postal_code]
+    references:
+      locators: [party_id, locator_function, first_used_on]
+      sites: [address1, address2, address3, city, zip_or_postal_code]
+      zip_or_postal_codes: zip_or_postal_code
+
+  - postal_locators:
+    party_id: refid
+    locator_function: function
+    first_used_on: date
+    address1: address
+    address2: address
+    address3: address
+    city: city
+    zip_or_postal_code: zip_or_postal_code
+    pkey: [party_id, locator_function]
+    references:
+      locators: [party_id, locator_function, first_used_on]
+      mailboxes: [address1, address2, address3, city, zip_or_postal_code]
+      zip_or_postal_codes: zip_or_postal_code
+
+  - party_types:
+    party_type: name
+    pkey: party_type
+
+  - party_classifications:
+    party_id: refid
+    party_type: name
+    pkey: [party_id, party_type]
+    references:
+      parties: party_id
+      party_types: party_type
+
+  - party_type_schemes:
+    party_type_scheme: name
+    owned_by: refid
+    pkey: party_type_scheme
+    references:
+      parties: owned_by
+
+  - party_type_structures:
+    party_type_scheme: name
+    supertype: name
+    subtype: name
+    pkey: [party_type_scheme, supertype, subtype]
+    references:
+      party_type_schemes: party_type_scheme
+      party_types: supertype
+      party_types: subtype
+
