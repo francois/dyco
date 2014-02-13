@@ -2,6 +2,10 @@
 
 A tool to build your schemas from a dictionary rather than writing migrations.
 
+# Examples
+
+Look in the `examples/` directory for some sample declarations.
+
 # Why the name "dyco" ?
 
 In French (my native tongue), "dico" is the abbreviation for "dictionnaire" (dictionary). I wanted a play on words that French people would recognize.
